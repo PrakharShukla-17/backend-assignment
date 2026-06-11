@@ -1,6 +1,7 @@
 ﻿const cors = require("cors");
 const express = require("express");
 const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
 
 const applicationRoutes = require("./routes/applicationRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -14,9 +15,20 @@ const notFound = require("./middleware/notFound");
 
 const app = express();
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+
+
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(limiter);
+
 
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
