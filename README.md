@@ -407,3 +407,81 @@ Key architectural decisions:
 
 ```
 ```
+## Additional Security Enhancements
+
+### Role-Based Authorization
+
+Role-based access control was implemented using custom authorization middleware.
+
+Supported roles:
+
+```text
+student
+counselor
+```
+
+Authorization is enforced after JWT authentication.
+
+Current restrictions:
+
+* Students can register, login, browse programs, receive recommendations, and create applications.
+* Only counselors can update application statuses and move applications through the admission workflow.
+
+This ensures that application lifecycle management remains under counselor control and prevents unauthorized status modifications.
+
+---
+
+### Rate Limiting
+
+Global API rate limiting was added using `express-rate-limit`.
+
+Configuration:
+
+```text
+100 requests per IP
+15-minute rolling window
+```
+
+Benefits:
+
+* Protects authentication endpoints from brute-force attempts.
+* Prevents accidental API abuse.
+* Provides a foundation for production-ready traffic management.
+
+When the limit is exceeded, the API responds with:
+
+```text
+429 Too Many Requests
+```
+
+---
+
+## Security Architecture
+
+Authentication and authorization are handled separately:
+
+### Authentication
+
+Implemented using:
+
+* JWT (JSON Web Tokens)
+* Protected route middleware
+* bcrypt password hashing
+
+Authentication answers:
+
+```text
+Who is making this request?
+```
+
+### Authorization
+
+Implemented using role-based middleware.
+
+Authorization answers:
+
+```text
+Is this user allowed to perform this action?
+```
+
+This separation improves maintainability and follows common backend security practices.
