@@ -18,6 +18,7 @@ module.exports = {
     "mongodb://127.0.0.1:27017/waygood-evaluation",
   port: Number(process.env.PORT) || 4000,
   redisUrl: process.env.REDIS_URL || "",
+  openRouterApiKey: process.env.OPENROUTER_API_KEY || "",
 };
 
 

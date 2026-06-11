@@ -2,6 +2,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
+const aiRoutes = require("./routes/aiRoutes");
 
 const applicationRoutes = require("./routes/applicationRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -29,7 +30,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use(limiter);
 
-
+app.use("/api/ai", aiRoutes);
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/universities", universityRoutes);
