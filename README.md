@@ -1,32 +1,69 @@
-﻿# Waygood Candidate Assignment
+﻿# Waygood Backend Assignment
 
-Submitted by: Prakhar Shukla
-College: IET Lucknow
-
-
-
-# Waygood Candidate Assignment
-
-## Overview
-
-This project is a backend implementation for a study-abroad platform that helps students discover universities and programs, receive personalized recommendations, manage applications, and track their application journey.
-
-The implementation focuses on secure authentication, advanced program discovery, MongoDB aggregation pipelines, application workflow management, caching, performance optimization, and automated testing.
+**Submitted By:** Prakhar Shukla
+**College:** Institute of Engineering and Technology (IET), Lucknow
 
 ---
 
-## Setup Instructions
+# Overview
 
-### Backend Setup
+This project is a backend implementation for a study-abroad platform that helps students:
+
+* Discover universities and programs
+* Receive personalized program recommendations
+* Manage university applications
+* Track application progress
+* Receive AI-powered shortlist summaries
+
+The implementation focuses on secure authentication, MongoDB aggregation pipelines, application workflow management, caching, performance optimization, authorization, and automated testing.
+
+---
+
+# Tech Stack
+
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+* JWT Authentication
+* bcrypt
+* Jest
+* Supertest
+* OpenRouter (LLM Integration)
+
+---
+
+# Setup Instructions
+
+## Install Dependencies
 
 ```bash
-cd backend
 npm install
 ```
 
-Create a `.env` file using `.env.example` as a reference.
+---
 
-Start the development server:
+## Configure Environment Variables
+
+Create a `.env` file:
+
+```env
+PORT=5000
+
+MONGODB_URI=
+MONGODB_URI_TEST=
+
+JWT_SECRET=
+JWT_EXPIRES_IN=7d
+
+CACHE_TTL_SECONDS=300
+
+OPENROUTER_API_KEY=
+```
+
+---
+
+## Start Development Server
 
 ```bash
 npm run dev
@@ -34,15 +71,15 @@ npm run dev
 
 ---
 
-## Seed Data
+## Seed Database
 
-Populate the development database with sample data:
+Populate development database:
 
 ```bash
 npm run seed
 ```
 
-Populate the test database:
+Populate test database:
 
 ```bash
 npm run seed:test
@@ -50,7 +87,7 @@ npm run seed:test
 
 ---
 
-## Running Tests
+## Run Tests
 
 ```bash
 npm test
@@ -58,20 +95,7 @@ npm test
 
 ---
 
-## Environment Variables
-
-```env
-MONGODB_URI=
-MONGODB_URI_TEST=
-JWT_SECRET=
-JWT_EXPIRES_IN=
-CACHE_TTL_SECONDS=
-PORT=
-```
-
----
-
-## Sample Credentials
+# Sample Credentials
 
 After running the seed script:
 
@@ -83,13 +107,11 @@ counselor@example.com / Candidate123!
 
 ---
 
-# Implemented Features
+# API Features
 
 ## Authentication
 
-Implemented secure authentication using JWT and bcrypt.
-
-Endpoints:
+### Endpoints
 
 ```text
 POST /api/auth/register
@@ -97,56 +119,69 @@ POST /api/auth/login
 GET  /api/auth/me
 ```
 
-Features:
+### Features
 
 * JWT-based authentication
 * Password hashing using bcrypt
 * Protected profile endpoint
 * Student and counselor role support
-* Input validation and duplicate email prevention
+* Duplicate email prevention
+* Input validation
 
 ---
 
 ## University Discovery
 
-Implemented filtering, sorting, search, and pagination.
+### Endpoint
 
-Supported filters:
+```text
+GET /api/universities
+```
 
-* Country
-* Partner Type
-* Scholarship Availability
-* Search Query
+### Features
 
-Supported sorting:
+* Country filtering
+* Partner type filtering
+* Scholarship filtering
+* Search support
+* Pagination
+* Sorting
 
-* Popularity
-* Ranking
-* Name
+### Popular Universities
 
-Pagination metadata included in responses.
+```text
+GET /api/universities/popular
+```
+
+Cached for improved performance.
 
 ---
 
 ## Program Discovery
 
-Implemented advanced filtering and pagination.
+### Endpoint
 
-Supported filters:
+```text
+GET /api/programs
+```
+
+### Filters
 
 * Country
-* Degree Level
+* Degree level
 * Field
 * Intake
-* Budget / Tuition Fee
-* Scholarship Availability
-* Search Query
+* Budget
+* Scholarship availability
+* Search query
 
-Supported sorting:
+### Sorting
 
 * Relevance
-* Tuition Ascending
-* Tuition Descending
+* Tuition (Ascending)
+* Tuition (Descending)
+
+### Pagination
 
 Pagination metadata included in responses.
 
@@ -154,43 +189,54 @@ Pagination metadata included in responses.
 
 ## Recommendation Engine
 
-Implemented recommendations using MongoDB Aggregation Pipelines.
+### Endpoint
 
-Recommendation factors:
+```text
+GET /api/recommendations/:studentId
+```
+
+### Implementation
+
+Recommendations are generated using MongoDB Aggregation Pipelines.
+
+### Recommendation Factors
 
 * Preferred country
-* Field of interest alignment
+* Field alignment
 * Budget compatibility
-* Preferred intake availability
-* IELTS requirement eligibility
+* Preferred intake
+* IELTS eligibility
 
-Recommendations return:
+### Returned Data
 
 * Match score
 * Matching reasons
-* Top-ranked programs
-
-Aggregation is used for scoring and ranking while recommendation explanations are generated in the application layer.
+* Ranked recommendations
 
 ---
 
 ## Application Workflow
 
-Implemented:
+### Create Application
 
 ```text
-POST  /api/applications
+POST /api/applications
+```
+
+### Update Status
+
+```text
 PATCH /api/applications/:id/status
 ```
 
-Features:
+### Features
 
 * Duplicate application prevention
 * Intake validation
 * Status transition validation
 * Timeline/history tracking
 
-Supported statuses:
+### Supported Statuses
 
 ```text
 draft
@@ -202,7 +248,7 @@ enrolled
 rejected
 ```
 
-Valid transitions:
+### Valid Status Transitions
 
 ```text
 draft -> submitted
@@ -216,7 +262,120 @@ offer-received -> visa-processing | rejected
 visa-processing -> enrolled | rejected
 ```
 
-Every status change automatically creates a timeline entry for auditing and progress tracking.
+Every status change automatically creates a timeline entry.
+
+---
+
+# Bonus Features
+
+## AI-Powered Shortlist Summaries
+
+### Endpoint
+
+```text
+GET /api/ai/shortlist-summary/:studentId
+```
+
+### Implementation
+
+The endpoint combines:
+
+* Student profile information
+* Recommendation engine results
+* Large Language Model (LLM) analysis through OpenRouter
+
+The student's profile and recommended programs are sent to the LLM, which generates personalized guidance.
+
+### AI Response Includes
+
+* Personalized shortlist summary
+* Program fit explanations
+* Profile weaknesses
+* Recommended next steps
+
+### Example Response Structure
+
+```json
+{
+  "success": true,
+  "data": {
+    "shortlistSummary": "...",
+    "recommendations": [
+      {
+        "program": "...",
+        "reason": "..."
+      }
+    ],
+    "profileWeaknesses": [
+      "..."
+    ],
+    "nextSteps": [
+      "..."
+    ]
+  }
+}
+```
+
+### Notes
+
+* Uses OpenRouter-compatible models
+* Returns structured JSON
+* Frontend-friendly response format
+* Handles missing API configuration gracefully
+
+---
+
+## Role-Based Authorization
+
+Role-based access control was implemented using middleware.
+
+### Supported Roles
+
+```text
+student
+counselor
+```
+
+### Authorization Rules
+
+Students can:
+
+* Register
+* Login
+* Browse programs
+* Receive recommendations
+* Create applications
+
+Counselors can:
+
+* Update application statuses
+
+This prevents students from modifying application workflow states.
+
+---
+
+## Rate Limiting
+
+Global API rate limiting was added using `express-rate-limit`.
+
+### Configuration
+
+```text
+100 requests per IP
+15 minute window
+```
+
+### Benefits
+
+* Protects login endpoints from brute-force attacks
+* Prevents API abuse
+* Improves production readiness
+
+Exceeded limits return:
+
+```text
+429 Too Many Requests
+```
 
 ---
 
@@ -238,13 +397,13 @@ This allows students to apply for different intake cycles of the same program wh
 
 Recommendation scoring is performed inside MongoDB using aggregation pipelines.
 
-Reasons for recommendations are generated in the application layer to keep aggregation logic focused on filtering, ranking, and scoring.
+Recommendation explanations are generated separately to keep aggregation focused on ranking and scoring.
 
 ---
 
 ## Intake Validation
 
-Students can only create applications for intakes explicitly offered by the selected program.
+Applications can only be created for intakes explicitly offered by the selected program.
 
 ---
 
@@ -258,38 +417,44 @@ All passwords are hashed using bcrypt before persistence.
 
 # Performance Optimizations
 
-## Caching Strategy
+## Caching
 
-The provided in-memory cache service was retained for simplicity and ease of local setup.
+The provided in-memory cache service was retained for simplicity.
 
-Cached endpoints:
+### Cached Endpoints
 
 ```text
 GET /api/universities/popular
 GET /api/dashboard
 ```
 
-Cache responses include hit/miss metadata for easier debugging and verification.
-
 ### Tradeoff
 
-For a production-scale deployment, Redis would be preferred because cached data could be shared across multiple backend instances and survive application restarts.
+For large-scale production deployments, Redis would be preferred because it supports:
+
+* Distributed caching
+* Shared cache across instances
+* Persistence across restarts
 
 ---
 
 ## MongoDB Aggregation
 
-Program recommendations use MongoDB aggregation pipelines to perform scoring and ranking within the database instead of transferring large datasets to the application layer.
+Recommendations are generated using aggregation pipelines instead of application-side filtering.
 
-This reduces unnecessary application-side processing.
+Benefits:
+
+* Reduced memory usage
+* Reduced data transfer
+* Improved scalability
 
 ---
 
 ## MongoDB Indexes
 
-### Program
+### Program Collection
 
-Index:
+Indexes:
 
 ```text
 country
@@ -298,13 +463,11 @@ field
 tuitionFeeUsd
 ```
 
-Optimizes program discovery queries.
-
 ---
 
-### University
+### University Collection
 
-Text Index:
+Search-related indexes:
 
 ```text
 name
@@ -312,11 +475,9 @@ country
 city
 ```
 
-Optimizes search functionality.
-
 ---
 
-### Application
+### Application Collection
 
 Indexes:
 
@@ -327,23 +488,21 @@ status
 intake
 ```
 
-Used for application lookups and filtering.
-
-Compound Unique Index:
+### Compound Unique Constraint
 
 ```text
 (student, program, intake)
 ```
 
-Prevents duplicate applications while allowing applications across different intake cycles.
+Prevents duplicate applications.
 
 ---
 
 # Testing
 
-Automated tests were added using Jest and Supertest.
+Automated tests were implemented using Jest and Supertest.
 
-Covered flows:
+## Covered Flows
 
 ### Authentication
 
@@ -359,7 +518,7 @@ Covered flows:
 
 * Duplicate application prevention
 
-Run tests using:
+Run tests:
 
 ```bash
 npm test
@@ -367,121 +526,41 @@ npm test
 
 ---
 
+# Project Structure
+
+```text
+src/
+├── config/
+├── controllers/
+├── middleware/
+├── models/
+├── routes/
+├── services/
+├── scripts/
+├── utils/
+└── tests/
+```
+
+### Architecture Notes
+
+* Controller-Service separation
+* Middleware-based authentication and authorization
+* MongoDB aggregation for recommendations
+* Centralized error handling
+* Reusable caching service
+* AI integration isolated in dedicated service layer
+
+---
+
 # Future Improvements
 
-Potential enhancements:
-
 * Redis-based distributed caching
-* Role-based authorization middleware
-* AI-assisted study planning
-* Advanced recommendation scoring and weighting
-* Rate limiting and API security enhancements
-* Docker support
-* CI/CD integration
-* Recommendation explanation enrichment
-* Analytics dashboards for counselors
+* Dockerization
+* CI/CD pipeline integration
+* AI-powered SOP review
+* Scholarship matching recommendations
+* Multi-turn AI counseling assistant
+* Advanced analytics dashboard
+* Email notifications and reminders
 
 ---
-
-## Architecture Notes
-
-The project follows a layered structure:
-
-```text
-controllers/
-services/
-middleware/
-models/
-routes/
-utils/
-```
-
-Key architectural decisions:
-
-* Business logic separated from routing
-* MongoDB aggregation used for recommendation scoring
-* Middleware-based authentication
-* Centralized error handling
-* Reusable in-memory caching service
-* Automated tests covering critical workflows
-
-```
-```
-## Additional Security Enhancements
-
-### Role-Based Authorization
-
-Role-based access control was implemented using custom authorization middleware.
-
-Supported roles:
-
-```text
-student
-counselor
-```
-
-Authorization is enforced after JWT authentication.
-
-Current restrictions:
-
-* Students can register, login, browse programs, receive recommendations, and create applications.
-* Only counselors can update application statuses and move applications through the admission workflow.
-
-This ensures that application lifecycle management remains under counselor control and prevents unauthorized status modifications.
-
----
-
-### Rate Limiting
-
-Global API rate limiting was added using `express-rate-limit`.
-
-Configuration:
-
-```text
-100 requests per IP
-15-minute rolling window
-```
-
-Benefits:
-
-* Protects authentication endpoints from brute-force attempts.
-* Prevents accidental API abuse.
-* Provides a foundation for production-ready traffic management.
-
-When the limit is exceeded, the API responds with:
-
-```text
-429 Too Many Requests
-```
-
----
-
-## Security Architecture
-
-Authentication and authorization are handled separately:
-
-### Authentication
-
-Implemented using:
-
-* JWT (JSON Web Tokens)
-* Protected route middleware
-* bcrypt password hashing
-
-Authentication answers:
-
-```text
-Who is making this request?
-```
-
-### Authorization
-
-Implemented using role-based middleware.
-
-Authorization answers:
-
-```text
-Is this user allowed to perform this action?
-```
-
-This separation improves maintainability and follows common backend security practices.
